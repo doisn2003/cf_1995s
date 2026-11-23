@@ -25,6 +25,7 @@ import {
   upsertB2bPriceTierApi,
   type LiveB2bOverviewDTO,
 } from '../../api/b2bAndTransferApi';
+import { Pagination, paginateList } from '../../components/Pagination';
 
 function formatVnd(n: number): string {
   return `${new Intl.NumberFormat('vi-VN').format(Math.round(n))} đ`;
@@ -45,6 +46,12 @@ export function B2bCustomerAndTierCrudPanel({
   const [saving, setSaving] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
+
+  // Pagination states
+  const [custPage, setCustPage] = useState<number>(1);
+  const [custPageSize, setCustPageSize] = useState<number>(10);
+  const [tierPage, setTierPage] = useState<number>(1);
+  const [tierPageSize, setTierPageSize] = useState<number>(10);
 
   // B2C Retail coffee sale at Central Warehouse
   const roastedItems = inventoryItems.filter(
@@ -510,7 +517,7 @@ export function B2bCustomerAndTierCrudPanel({
                 </tr>
               </thead>
               <tbody className="divide-y divide-stone-100">
-                {overview.customers.map((c) => (
+                {paginateList(overview.customers, custPage, custPageSize).map((c) => (
                   <tr key={c.id}>
                     <td className="px-4 py-3">
                       <div className="font-bold text-stone-900">
@@ -541,6 +548,13 @@ export function B2bCustomerAndTierCrudPanel({
               </tbody>
             </table>
           </div>
+          <Pagination
+            currentPage={custPage}
+            totalItems={overview.customers.length}
+            pageSize={custPageSize}
+            onPageChange={setCustPage}
+            onPageSizeChange={setCustPageSize}
+          />
         </div>
       )}
 
@@ -620,7 +634,7 @@ export function B2bCustomerAndTierCrudPanel({
                 </tr>
               </thead>
               <tbody className="divide-y divide-stone-100">
-                {overview.price_tiers.map((pt) => {
+                {paginateList(overview.price_tiers, tierPage, tierPageSize).map((pt) => {
                   const inv = inventoryItems.find((i) => i.id === pt.item_id);
                   return (
                     <tr key={pt.id}>
@@ -653,6 +667,13 @@ export function B2bCustomerAndTierCrudPanel({
               </tbody>
             </table>
           </div>
+          <Pagination
+            currentPage={tierPage}
+            totalItems={overview.price_tiers.length}
+            pageSize={tierPageSize}
+            onPageChange={setTierPage}
+            onPageSizeChange={setTierPageSize}
+          />
         </div>
       )}
     </div>

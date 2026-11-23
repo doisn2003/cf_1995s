@@ -12,6 +12,7 @@ import {
 } from '@cf19/shared';
 import { ApiClientError } from '../../api/apiClient';
 import { completeRoastBatchApi } from '../../api/warehouseApi';
+import { Pagination, paginateList } from '../../components/Pagination';
 
 export interface RoasteryBatchLifecyclePanelProps {
   stockSummaries: WarehouseStockSummaryDTO[];
@@ -73,6 +74,8 @@ export function RoasteryBatchLifecyclePanel({
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
+  const [batchPage, setBatchPage] = useState<number>(1);
+  const [batchPageSize, setBatchPageSize] = useState<number>(10);
 
   const selectedSourceLot = useMemo(
     () => availableGreenLots.find((l) => l.id === sourceGreenLotId),
@@ -346,7 +349,7 @@ export function RoasteryBatchLifecyclePanel({
               </tr>
             </thead>
             <tbody className="divide-y divide-stone-100">
-              {roastBatches.map((batch) => (
+              {paginateList(roastBatches, batchPage, batchPageSize).map((batch) => (
                 <tr key={batch.id}>
                   <td className="px-3 py-2 font-mono text-xs font-semibold">
                     {batch.batch_code}
@@ -376,6 +379,13 @@ export function RoasteryBatchLifecyclePanel({
             </tbody>
           </table>
         </div>
+        <Pagination
+          currentPage={batchPage}
+          totalItems={roastBatches.length}
+          pageSize={batchPageSize}
+          onPageChange={setBatchPage}
+          onPageSizeChange={setBatchPageSize}
+        />
       </section>
     </div>
   );

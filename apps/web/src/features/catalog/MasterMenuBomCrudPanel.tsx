@@ -35,6 +35,7 @@ import {
   upsertMenuVariantApi,
 } from '../../api/posCatalogApi';
 import { fetchWarehouseItems } from '../../api/warehouseApi';
+import { Pagination, paginateList } from '../../components/Pagination';
 
 function formatVnd(n: number): string {
   return `${new Intl.NumberFormat('vi-VN').format(Math.round(n))} đ`;
@@ -53,6 +54,14 @@ export function MasterMenuBomCrudPanel() {
   const [loading, setLoading] = useState<boolean>(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
+
+  // Pagination states
+  const [prodPage, setProdPage] = useState<number>(1);
+  const [prodPageSize, setProdPageSize] = useState<number>(10);
+  const [modPage, setModPage] = useState<number>(1);
+  const [modPageSize, setModPageSize] = useState<number>(10);
+  const [catPage, setCatPage] = useState<number>(1);
+  const [catPageSize, setCatPageSize] = useState<number>(10);
 
   // Category form
   const [editingCatId, setEditingCatId] = useState<string | null>(null);
@@ -557,7 +566,7 @@ export function MasterMenuBomCrudPanel() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-stone-100">
-                  {catalog.products.map((p: StoreCatalogProductDTO) => {
+                  {paginateList(catalog.products, prodPage, prodPageSize).map((p: StoreCatalogProductDTO) => {
                     const cat = catalog.categories.find((c) => c.id === p.category_id);
                     return (
                       <tr key={p.id} className="hover:bg-stone-50/70">
@@ -610,6 +619,13 @@ export function MasterMenuBomCrudPanel() {
                 </tbody>
               </table>
             </div>
+            <Pagination
+              currentPage={prodPage}
+              totalItems={catalog.products.length}
+              pageSize={prodPageSize}
+              onPageChange={setProdPage}
+              onPageSizeChange={setProdPageSize}
+            />
           </div>
         </div>
       )}
@@ -886,7 +902,7 @@ export function MasterMenuBomCrudPanel() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-stone-100">
-                {catalog.modifiers.map((m: MenuModifierDto) => (
+                {paginateList(catalog.modifiers, modPage, modPageSize).map((m: MenuModifierDto) => (
                   <tr key={m.id}>
                     <td className="px-4 py-2.5 font-mono font-semibold text-amber-900">
                       {m.modifier_group}
@@ -918,6 +934,13 @@ export function MasterMenuBomCrudPanel() {
               </tbody>
             </table>
           </div>
+          <Pagination
+            currentPage={modPage}
+            totalItems={catalog.modifiers.length}
+            pageSize={modPageSize}
+            onPageChange={setModPage}
+            onPageSizeChange={setModPageSize}
+          />
         </div>
       )}
 
@@ -975,7 +998,7 @@ export function MasterMenuBomCrudPanel() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-stone-100">
-                {catalog.categories.map((c: MenuCategoryDto) => (
+                {paginateList(catalog.categories, catPage, catPageSize).map((c: MenuCategoryDto) => (
                   <tr key={c.id}>
                     <td className="px-4 py-2.5 font-mono">{c.sort_order}</td>
                     <td className="px-4 py-2.5 font-bold text-stone-900">{c.name}</td>
@@ -1002,6 +1025,13 @@ export function MasterMenuBomCrudPanel() {
               </tbody>
             </table>
           </div>
+          <Pagination
+            currentPage={catPage}
+            totalItems={catalog.categories.length}
+            pageSize={catPageSize}
+            onPageChange={setCatPage}
+            onPageSizeChange={setCatPageSize}
+          />
         </div>
       )}
     </div>

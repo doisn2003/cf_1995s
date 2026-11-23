@@ -25,6 +25,7 @@ import {
   updateUserApi,
   type StaffProfileRecord,
 } from '../../api/apiClient';
+import { Pagination, paginateList } from '../../components/Pagination';
 
 const ROLE_OPTIONS: Array<{ value: UserRole; label: string }> = [
   { value: 'SUPER_ADMIN', label: 'Chủ chuỗi (SUPER_ADMIN)' },
@@ -49,6 +50,10 @@ export function StoreAndStaffCrudPanel() {
   const [subTab, setSubTab] = useState<'stores' | 'staff'>('stores');
   const [stores, setStores] = useState<StoreDto[]>([]);
   const [users, setUsers] = useState<StaffProfileRecord[]>([]);
+  const [storePage, setStorePage] = useState<number>(1);
+  const [storePageSize, setStorePageSize] = useState<number>(10);
+  const [staffPage, setStaffPage] = useState<number>(1);
+  const [staffPageSize, setStaffPageSize] = useState<number>(10);
   const [loading, setLoading] = useState<boolean>(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
@@ -450,7 +455,7 @@ export function StoreAndStaffCrudPanel() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-stone-100">
-                  {stores.map((st) => (
+                  {paginateList(stores, storePage, storePageSize).map((st) => (
                     <tr key={st.id} className="hover:bg-stone-50/70">
                       <td className="px-4 py-3">
                         <div className="font-bold text-stone-900">
@@ -529,6 +534,13 @@ export function StoreAndStaffCrudPanel() {
                 </tbody>
               </table>
             </div>
+            <Pagination
+              currentPage={storePage}
+              totalItems={stores.length}
+              pageSize={storePageSize}
+              onPageChange={setStorePage}
+              onPageSizeChange={setStorePageSize}
+            />
           </div>
         </div>
       ) : (
@@ -751,7 +763,7 @@ export function StoreAndStaffCrudPanel() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-stone-100">
-                    {users.map((u) => (
+                    {paginateList(users, staffPage, staffPageSize).map((u) => (
                       <tr key={u.id} className="hover:bg-stone-50/70">
                         <td className="px-4 py-3">
                           <div className="font-bold text-stone-900 flex items-center gap-1.5">
@@ -806,6 +818,13 @@ export function StoreAndStaffCrudPanel() {
                   </tbody>
                 </table>
               </div>
+              <Pagination
+                currentPage={staffPage}
+                totalItems={users.length}
+                pageSize={staffPageSize}
+                onPageChange={setStaffPage}
+                onPageSizeChange={setStaffPageSize}
+              />
             </div>
           </div>
         </div>

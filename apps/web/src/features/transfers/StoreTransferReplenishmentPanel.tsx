@@ -16,6 +16,7 @@ import {
   requestInternalTransferApi,
   type LiveInternalTransferDto,
 } from '../../api/b2bAndTransferApi';
+import { Pagination, paginateList } from '../../components/Pagination';
 
 export interface StoreTransferReplenishmentPanelProps {
   storeId: string;
@@ -33,6 +34,8 @@ export function StoreTransferReplenishmentPanel({
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
+  const [transferPage, setTransferPage] = useState<number>(1);
+  const [transferPageSize, setTransferPageSize] = useState<number>(5);
 
   const loadData = useCallback(async () => {
     const [invList, trList] = await Promise.all([
@@ -234,7 +237,7 @@ export function StoreTransferReplenishmentPanel({
           </h2>
         </div>
 
-        {transfers.map((tr) => (
+        {paginateList(transfers, transferPage, transferPageSize).map((tr) => (
           <div key={tr.id} className="rounded-xl border border-stone-200 p-4 bg-stone-50 space-y-3">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div className="flex items-center gap-2">
@@ -304,6 +307,15 @@ export function StoreTransferReplenishmentPanel({
             )}
           </div>
         ))}
+
+        <Pagination
+          currentPage={transferPage}
+          totalItems={transfers.length}
+          pageSize={transferPageSize}
+          onPageChange={setTransferPage}
+          onPageSizeChange={setTransferPageSize}
+          pageSizeOptions={[5, 10, 20]}
+        />
       </section>
     </div>
   );

@@ -18,6 +18,7 @@ import {
   fetchWarehouseItems,
   updateWarehouseItemApi,
 } from '../../api/warehouseApi';
+import { Pagination, paginateList } from '../../components/Pagination';
 
 const CATEGORY_LABELS: Record<InventoryCategory, string> = {
   GREEN_BEAN: 'Cà phê Nhân Xanh',
@@ -36,6 +37,8 @@ export interface InventoryItemsCrudPanelProps {
 
 export function InventoryItemsCrudPanel({ onItemsChanged }: InventoryItemsCrudPanelProps) {
   const [items, setItems] = useState<WarehouseInventoryItemDto[]>([]);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [pageSize, setPageSize] = useState<number>(10);
   const [loading, setLoading] = useState<boolean>(true);
   const [saving, setSaving] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -301,7 +304,7 @@ export function InventoryItemsCrudPanel({ onItemsChanged }: InventoryItemsCrudPa
                 </tr>
               </thead>
               <tbody className="divide-y divide-stone-100">
-                {items.map((it) => (
+                {paginateList(items, currentPage, pageSize).map((it) => (
                   <tr key={it.id} className="hover:bg-stone-50/70">
                     <td className="px-4 py-3">
                       <div className="font-bold text-stone-900">{it.name}</div>
@@ -343,6 +346,13 @@ export function InventoryItemsCrudPanel({ onItemsChanged }: InventoryItemsCrudPa
               </tbody>
             </table>
           </div>
+          <Pagination
+            currentPage={currentPage}
+            totalItems={items.length}
+            pageSize={pageSize}
+            onPageChange={setCurrentPage}
+            onPageSizeChange={setPageSize}
+          />
         </div>
       </div>
     </div>

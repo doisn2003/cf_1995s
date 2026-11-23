@@ -17,6 +17,7 @@ import {
   cloneFranchiseStoreApi,
   previewFranchisePricingApi,
 } from '../../api/executiveAnalyticsApi';
+import { Pagination, paginateList } from '../../components/Pagination';
 
 export interface FranchiseStoreCloningWizardProps {
   onStoreCloned: (result: CloneFranchiseStoreResultDTO) => void;
@@ -40,6 +41,8 @@ export function FranchiseStoreCloningWizard({
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [clonedResult, setClonedResult] = useState<CloneFranchiseStoreResultDTO | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [previewPage, setPreviewPage] = useState<number>(1);
+  const [previewPageSize, setPreviewPageSize] = useState<number>(5);
 
   useEffect(() => {
     let active = true;
@@ -301,7 +304,7 @@ export function FranchiseStoreCloningWizard({
                 </tr>
               </thead>
               <tbody className="divide-y divide-stone-100">
-                {pricingPreview.map((item) => (
+                {paginateList(pricingPreview, previewPage, previewPageSize).map((item) => (
                   <tr key={item.product_id}>
                     <td className="px-3 py-2 font-medium text-stone-900">
                       {item.product_name}
@@ -323,6 +326,14 @@ export function FranchiseStoreCloningWizard({
               </tbody>
             </table>
           </div>
+          <Pagination
+            currentPage={previewPage}
+            totalItems={pricingPreview.length}
+            pageSize={previewPageSize}
+            onPageChange={setPreviewPage}
+            onPageSizeChange={setPreviewPageSize}
+            pageSizeOptions={[5, 10, 20]}
+          />
         </div>
       </div>
     </section>

@@ -10,6 +10,7 @@ import {
 } from '@cf19/shared';
 import { ApiClientError } from '../../api/apiClient';
 import { recordB2bDebtPaymentApi } from '../../api/b2bAndTransferApi';
+import { Pagination, paginateList } from '../../components/Pagination';
 
 export interface B2bArAgingAndLedgerPanelProps {
   customers: B2bCustomerDto[];
@@ -34,6 +35,8 @@ export function B2bArAgingAndLedgerPanel({
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
+  const [ledgerPage, setLedgerPage] = useState<number>(1);
+  const [ledgerPageSize, setLedgerPageSize] = useState<number>(10);
 
   const selectedCustomer = customers.find((c) => c.id === customerId) ?? customers[0];
 
@@ -252,7 +255,7 @@ export function B2bArAgingAndLedgerPanel({
               </tr>
             </thead>
             <tbody className="divide-y divide-stone-100">
-              {ledgerEntries.map((entry) => (
+              {paginateList(ledgerEntries, ledgerPage, ledgerPageSize).map((entry) => (
                 <tr key={entry.id}>
                   <td className="px-3 py-2 font-mono text-xs font-bold">
                     <span
@@ -279,6 +282,13 @@ export function B2bArAgingAndLedgerPanel({
             </tbody>
           </table>
         </div>
+        <Pagination
+          currentPage={ledgerPage}
+          totalItems={ledgerEntries.length}
+          pageSize={ledgerPageSize}
+          onPageChange={setLedgerPage}
+          onPageSizeChange={setLedgerPageSize}
+        />
       </section>
     </div>
   );

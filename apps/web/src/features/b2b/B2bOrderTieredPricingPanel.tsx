@@ -11,6 +11,7 @@ import {
 } from '@cf19/shared';
 import { ApiClientError } from '../../api/apiClient';
 import { createB2bOrderApi } from '../../api/b2bAndTransferApi';
+import { Pagination, paginateList } from '../../components/Pagination';
 
 export interface B2bOrderTieredPricingPanelProps {
   customers: B2bCustomerDto[];
@@ -47,6 +48,8 @@ export function B2bOrderTieredPricingPanel({
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
+  const [orderPage, setOrderPage] = useState<number>(1);
+  const [orderPageSize, setOrderPageSize] = useState<number>(10);
 
   const selectedCustomer = useMemo(
     () => customers.find((c) => c.id === customerId) ?? customers[0],
@@ -298,7 +301,7 @@ export function B2bOrderTieredPricingPanel({
               </tr>
             </thead>
             <tbody className="divide-y divide-stone-100">
-              {orders.map((ord) => (
+              {paginateList(orders, orderPage, orderPageSize).map((ord) => (
                 <tr key={ord.id}>
                   <td className="px-3 py-2 font-mono text-xs font-bold">{ord.order_code}</td>
                   <td className="px-3 py-2 font-mono text-xs">{ord.payment_status}</td>
@@ -317,6 +320,13 @@ export function B2bOrderTieredPricingPanel({
             </tbody>
           </table>
         </div>
+        <Pagination
+          currentPage={orderPage}
+          totalItems={orders.length}
+          pageSize={orderPageSize}
+          onPageChange={setOrderPage}
+          onPageSizeChange={setOrderPageSize}
+        />
       </section>
     </div>
   );

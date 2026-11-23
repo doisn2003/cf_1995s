@@ -40,6 +40,7 @@ import {
   type PosModifierConfirmPayload,
 } from './PosModifierMatrixModal';
 import { VietQrWebhookMonitorPanel } from './VietQrWebhookMonitorPanel';
+import { Pagination, paginateList } from '../../components/Pagination';
 
 export interface PosTerminalWorkbenchProps {
   storeId: string;
@@ -71,6 +72,8 @@ export function PosTerminalWorkbench({
   } | null>(null);
   const [vietQrTarget, setVietQrTarget] = useState<PosOrderFullDto | null>(null);
   const [webhookRefreshSignal, setWebhookRefreshSignal] = useState<number>(0);
+  const [orderPage, setOrderPage] = useState<number>(1);
+  const [orderPageSize, setOrderPageSize] = useState<number>(5);
 
   const cartItems = usePosTerminalStore((s) => s.cartItems);
   const isOfflineMode = usePosTerminalStore((s) => s.isOfflineSimulationMode);
@@ -517,7 +520,7 @@ export function PosTerminalWorkbench({
           Hóa Đơn Gần Nhất Tại Chi Nhánh ({orders.length} đơn)
         </h2>
         <div className="space-y-2">
-          {orders.map((ord) => (
+          {paginateList(orders, orderPage, orderPageSize).map((ord) => (
             <div
               key={ord.id}
               className="p-3 rounded-xl border border-stone-200 bg-stone-50 flex flex-wrap items-center justify-between gap-3 text-xs"
@@ -578,6 +581,15 @@ export function PosTerminalWorkbench({
             </div>
           ))}
         </div>
+
+        <Pagination
+          currentPage={orderPage}
+          totalItems={orders.length}
+          pageSize={orderPageSize}
+          onPageChange={setOrderPage}
+          onPageSizeChange={setOrderPageSize}
+          pageSizeOptions={[5, 10, 20]}
+        />
       </section>
 
       <VietQrWebhookMonitorPanel

@@ -19,6 +19,7 @@ import {
   ingestWarehouseLotApi,
   updateWarehouseLotStatusApi,
 } from '../../api/warehouseApi';
+import { Pagination, paginateList } from '../../components/Pagination';
 
 export interface LotIngestMacPanelProps {
   stockSummaries: WarehouseStockSummaryDTO[];
@@ -46,6 +47,10 @@ export function LotIngestMacPanel({
   const [busyLotId, setBusyLotId] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
+  const [summaryPage, setSummaryPage] = useState<number>(1);
+  const [summaryPageSize, setSummaryPageSize] = useState<number>(10);
+  const [lotPage, setLotPage] = useState<number>(1);
+  const [lotPageSize, setLotPageSize] = useState<number>(10);
 
   const selectedSummary = useMemo(
     () => stockSummaries.find((s) => s.item_id === itemId),
@@ -163,7 +168,7 @@ export function LotIngestMacPanel({
               </tr>
             </thead>
             <tbody className="divide-y divide-stone-100">
-              {stockSummaries.map((row) => {
+              {paginateList(stockSummaries, summaryPage, summaryPageSize).map((row) => {
                 const nextFifoLot = lots.find(
                   (l) =>
                     l.item_id === row.item_id &&
@@ -203,6 +208,13 @@ export function LotIngestMacPanel({
             </tbody>
           </table>
         </div>
+        <Pagination
+          currentPage={summaryPage}
+          totalItems={stockSummaries.length}
+          pageSize={summaryPageSize}
+          onPageChange={setSummaryPage}
+          onPageSizeChange={setSummaryPageSize}
+        />
       </section>
 
       <section className="bg-white rounded-2xl border border-stone-200 p-6 shadow-sm">
@@ -380,7 +392,7 @@ export function LotIngestMacPanel({
               </tr>
             </thead>
             <tbody className="divide-y divide-stone-100">
-              {lots.map((lot) => {
+              {paginateList(lots, lotPage, lotPageSize).map((lot) => {
                 const itemMeta = itemById.get(lot.item_id);
                 return (
                   <tr key={lot.id}>
@@ -445,6 +457,13 @@ export function LotIngestMacPanel({
             </tbody>
           </table>
         </div>
+        <Pagination
+          currentPage={lotPage}
+          totalItems={lots.length}
+          pageSize={lotPageSize}
+          onPageChange={setLotPage}
+          onPageSizeChange={setLotPageSize}
+        />
       </section>
     </div>
   );

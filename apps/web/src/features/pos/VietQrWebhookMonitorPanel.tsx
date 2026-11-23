@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Activity, RefreshCw, Volume2, VolumeX } from 'lucide-react';
 import type { PaymentWebhookLogDto } from '@cf19/shared';
 import { fetchStoreWebhookLogsApi } from '../../api/vietqrApi';
+import { Pagination, paginateList } from '../../components/Pagination';
 import {
   getSpeakerAnnouncementHistory,
   isSpeakerMuted,
@@ -21,6 +22,9 @@ export function VietQrWebhookMonitorPanel({
   const [logs, setLogs] = useState<PaymentWebhookLogDto[]>([]);
   const [speakerLogs, setSpeakerLogs] = useState<SpeakerHistoryEntry[]>([]);
   const [muted, setMuted] = useState<boolean>(() => isSpeakerMuted());
+  const [logPage, setLogPage] = useState<number>(1);
+  const [speakerPage, setSpeakerPage] = useState<number>(1);
+  const pageSize = 5;
 
   const loadLogs = useCallback(async () => {
     try {
@@ -101,23 +105,32 @@ export function VietQrWebhookMonitorPanel({
               Chưa có giao dịch chuyển khoản VietQR nào tại chi nhánh.
             </p>
           ) : (
-            <div className="space-y-2 max-h-64 overflow-y-auto">
-              {logs.map((log) => (
-                <div
-                  key={log.id}
-                  className="p-3 rounded-xl border border-stone-200 bg-stone-50 text-xs space-y-1"
-                >
-                  <div className="flex justify-between font-mono font-bold text-stone-900">
-                    <span>{log.bank_tx_id}</span>
-                    <span className="text-emerald-700">
-                      +{log.amount_vnd.toLocaleString('vi-VN')} đ
-                    </span>
+            <div className="space-y-2">
+              <div className="space-y-2 min-h-[160px]">
+                {paginateList(logs, logPage, pageSize).map((log) => (
+                  <div
+                    key={log.id}
+                    className="p-3 rounded-xl border border-stone-200 bg-stone-50 text-xs space-y-1"
+                  >
+                    <div className="flex justify-between font-mono font-bold text-stone-900">
+                      <span>{log.bank_tx_id}</span>
+                      <span className="text-emerald-700">
+                        +{log.amount_vnd.toLocaleString('vi-VN')} đ
+                      </span>
+                    </div>
+                    <div className="text-[11px] text-stone-500 font-mono truncate">
+                      Mã đối soát: {log.idempotency_key}
+                    </div>
                   </div>
-                  <div className="text-[11px] text-stone-500 font-mono truncate">
-                    Mã đối soát: {log.idempotency_key}
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
+              <Pagination
+                currentPage={logPage}
+                totalItems={logs.length}
+                pageSize={pageSize}
+                onPageChange={setLogPage}
+                compact
+              />
             </div>
           )}
         </div>
@@ -131,23 +144,32 @@ export function VietQrWebhookMonitorPanel({
               Chưa có thông báo âm thanh nào được phát trong phiên làm việc này.
             </p>
           ) : (
-            <div className="space-y-2 max-h-64 overflow-y-auto">
-              {speakerLogs.map((entry) => (
-                <div
-                  key={entry.id}
-                  className="p-3 rounded-xl border border-indigo-100 bg-indigo-50/40 text-xs space-y-1"
-                >
-                  <div className="flex justify-between items-center">
-                    <span className="font-mono font-bold text-indigo-900">
-                      {entry.order_code}
-                    </span>
-                    <span className="px-2 py-0.5 rounded bg-white border border-indigo-200 text-[10px] font-mono">
-                      {entry.mode}
-                    </span>
+            <div className="space-y-2">
+              <div className="space-y-2 min-h-[160px]">
+                {paginateList(speakerLogs, speakerPage, pageSize).map((entry) => (
+                  <div
+                    key={entry.id}
+                    className="p-3 rounded-xl border border-indigo-100 bg-indigo-50/40 text-xs space-y-1"
+                  >
+                    <div className="flex justify-between items-center">
+                      <span className="font-mono font-bold text-indigo-900">
+                        {entry.order_code}
+                      </span>
+                      <span className="px-2 py-0.5 rounded bg-white border border-indigo-200 text-[10px] font-mono">
+                        {entry.mode}
+                      </span>
+                    </div>
+                    <p className="text-stone-700 leading-snug">{entry.script}</p>
                   </div>
-                  <p className="text-stone-700 leading-snug">{entry.script}</p>
-                </div>
-              ))}
+                ))}
+              </div>
+              <Pagination
+                currentPage={speakerPage}
+                totalItems={speakerLogs.length}
+                pageSize={pageSize}
+                onPageChange={setSpeakerPage}
+                compact
+              />
             </div>
           )}
         </div>

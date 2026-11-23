@@ -6,6 +6,7 @@ import {
   dispatchInternalTransferApi,
   type LiveInternalTransferDto,
 } from '../../api/b2bAndTransferApi';
+import { Pagination, paginateList } from '../../components/Pagination';
 
 export interface WarehouseTransferDispatchPanelProps {
   transfers: LiveInternalTransferDto[];
@@ -19,6 +20,8 @@ export function WarehouseTransferDispatchPanel({
   const [busyId, setBusyId] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
+  const [page, setPage] = useState<number>(1);
+  const [pageSize, setPageSize] = useState<number>(5);
 
   const handleDispatch = async (transferId: string) => {
     setErrorMsg(null);
@@ -83,7 +86,7 @@ export function WarehouseTransferDispatchPanel({
       )}
 
       <div className="space-y-3">
-        {transfers.map((tr) => (
+        {paginateList(transfers, page, pageSize).map((tr) => (
           <div
             key={tr.id}
             className="rounded-xl border border-stone-200 p-4 bg-stone-50 flex flex-wrap items-center justify-between gap-4"
@@ -156,6 +159,15 @@ export function WarehouseTransferDispatchPanel({
           </div>
         ))}
       </div>
+
+      <Pagination
+        currentPage={page}
+        totalItems={transfers.length}
+        pageSize={pageSize}
+        onPageChange={setPage}
+        onPageSizeChange={setPageSize}
+        pageSizeOptions={[5, 10, 20]}
+      />
     </section>
   );
 }

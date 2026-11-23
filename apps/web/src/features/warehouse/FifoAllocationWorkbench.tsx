@@ -7,6 +7,7 @@ import {
 } from '@cf19/shared';
 import { ApiClientError } from '../../api/apiClient';
 import { allocateFifoStockApi } from '../../api/warehouseApi';
+import { Pagination, paginateList } from '../../components/Pagination';
 
 export interface FifoAllocationWorkbenchProps {
   stockSummaries: WarehouseStockSummaryDTO[];
@@ -28,6 +29,8 @@ export function FifoAllocationWorkbench({
   const [lastDryRun, setLastDryRun] = useState<boolean>(true);
   const [result, setResult] = useState<FifoAllocationResultDTO | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [allocPage, setAllocPage] = useState<number>(1);
+  const [allocPageSize, setAllocPageSize] = useState<number>(10);
 
   const runAllocation = async (dryRun: boolean) => {
     setErrorMsg(null);
@@ -181,7 +184,7 @@ export function FifoAllocationWorkbench({
                 </tr>
               </thead>
               <tbody className="divide-y divide-stone-100">
-                {result.allocations.map((slice) => (
+                {paginateList(result.allocations, allocPage, allocPageSize).map((slice) => (
                   <tr key={slice.lot_id}>
                     <td className="px-3 py-2 font-mono text-xs font-semibold">
                       {slice.lot_code}
@@ -217,6 +220,13 @@ export function FifoAllocationWorkbench({
               </tbody>
             </table>
           </div>
+          <Pagination
+            currentPage={allocPage}
+            totalItems={result.allocations.length}
+            pageSize={allocPageSize}
+            onPageChange={setAllocPage}
+            onPageSizeChange={setAllocPageSize}
+          />
         </section>
       )}
     </div>

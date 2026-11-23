@@ -19,6 +19,7 @@ import {
   resolveLowStockAlertApi,
   submitStoreDailyStocktakeApi,
 } from '../../api/kdsAndShiftApi';
+import { Pagination, paginateList } from '../../components/Pagination';
 
 export interface StoreDailyStocktakePanelProps {
   storeId: string;
@@ -42,6 +43,9 @@ export function StoreDailyStocktakePanel({
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [statusMsg, setStatusMsg] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [historyPage, setHistoryPage] = useState<number>(1);
+  const [alertPage, setAlertPage] = useState<number>(1);
+  const pageSize = 5;
 
   const loadAll = useCallback(async () => {
     setLoading(true);
@@ -299,31 +303,40 @@ export function StoreDailyStocktakePanel({
           {history.length === 0 ? (
             <p className="text-xs text-stone-400">Chưa có phiếu kiểm kho nào được lưu.</p>
           ) : (
-            <div className="space-y-2 max-h-64 overflow-y-auto">
-              {history.map((item) => (
-                <div
-                  key={item.id}
-                  className="p-3 rounded-xl bg-stone-50 border border-stone-200 text-xs flex justify-between items-center gap-2"
-                >
-                  <div>
-                    <div className="font-bold text-stone-900">
-                      {item.stocktake_date} • {item.item_name}
-                    </div>
-                    <div className="text-[11px] font-mono text-stone-500">
-                      Lý thuyết: {item.theoretical_closing_qty} | Thực đếm: {item.actual_counted_qty} {item.base_unit}
-                    </div>
-                  </div>
-                  <span
-                    className={`font-mono font-bold px-2 py-0.5 rounded ${
-                      item.is_abnormal_shrinkage
-                        ? 'bg-red-100 text-red-800'
-                        : 'bg-emerald-100 text-emerald-800'
-                    }`}
+            <div className="space-y-2">
+              <div className="space-y-2 min-h-[160px]">
+                {paginateList(history, historyPage, pageSize).map((item) => (
+                  <div
+                    key={item.id}
+                    className="p-3 rounded-xl bg-stone-50 border border-stone-200 text-xs flex justify-between items-center gap-2"
                   >
-                    {item.variance_qty} ({item.variance_pct}%)
-                  </span>
-                </div>
-              ))}
+                    <div>
+                      <div className="font-bold text-stone-900">
+                        {item.stocktake_date} • {item.item_name}
+                      </div>
+                      <div className="text-[11px] font-mono text-stone-500">
+                        Lý thuyết: {item.theoretical_closing_qty} | Thực đếm: {item.actual_counted_qty} {item.base_unit}
+                      </div>
+                    </div>
+                    <span
+                      className={`font-mono font-bold px-2 py-0.5 rounded ${
+                        item.is_abnormal_shrinkage
+                          ? 'bg-red-100 text-red-800'
+                          : 'bg-emerald-100 text-emerald-800'
+                      }`}
+                    >
+                      {item.variance_qty} ({item.variance_pct}%)
+                    </span>
+                  </div>
+                ))}
+              </div>
+              <Pagination
+                currentPage={historyPage}
+                totalItems={history.length}
+                pageSize={pageSize}
+                onPageChange={setHistoryPage}
+                compact
+              />
             </div>
           )}
         </section>
@@ -337,38 +350,47 @@ export function StoreDailyStocktakePanel({
               Chưa có cảnh báo thiếu nguyên liệu nào từ quầy Bar.
             </p>
           ) : (
-            <div className="space-y-2 max-h-64 overflow-y-auto">
-              {barAlerts.map((al) => (
-                <div
-                  key={al.id}
-                  className={`p-3 rounded-xl border text-xs space-y-1 ${
-                    al.resolved
-                      ? 'bg-stone-50 border-stone-200 opacity-70'
-                      : 'bg-amber-50 border-amber-200'
-                  }`}
-                >
-                  <div className="flex justify-between items-center gap-2 font-bold text-amber-950">
-                    <span>{al.sku} • {al.item_name}</span>
-                    {al.resolved ? (
-                      <span className="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 text-[11px]">
-                        Đã xử lý
-                      </span>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={() => void handleResolveAlert(al.id)}
-                        className="px-2.5 py-1 rounded-lg bg-emerald-700 text-white text-[11px] font-semibold hover:bg-emerald-800"
-                      >
-                        Đánh dấu đã xử lý
-                      </button>
-                    )}
+            <div className="space-y-2">
+              <div className="space-y-2 min-h-[160px]">
+                {paginateList(barAlerts, alertPage, pageSize).map((al) => (
+                  <div
+                    key={al.id}
+                    className={`p-3 rounded-xl border text-xs space-y-1 ${
+                      al.resolved
+                        ? 'bg-stone-50 border-stone-200 opacity-70'
+                        : 'bg-amber-50 border-amber-200'
+                    }`}
+                  >
+                    <div className="flex justify-between items-center gap-2 font-bold text-amber-950">
+                      <span>{al.sku} • {al.item_name}</span>
+                      {al.resolved ? (
+                        <span className="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 text-[11px]">
+                          Đã xử lý
+                        </span>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => void handleResolveAlert(al.id)}
+                          className="px-2.5 py-1 rounded-lg bg-emerald-700 text-white text-[11px] font-semibold hover:bg-emerald-800"
+                        >
+                          Đánh dấu đã xử lý
+                        </button>
+                      )}
+                    </div>
+                    <div className="text-amber-900">{al.note}</div>
+                    <div className="text-[11px] text-stone-500">
+                      Báo bởi: {al.reported_by_name} • Mức độ: {al.severity}
+                    </div>
                   </div>
-                  <div className="text-amber-900">{al.note}</div>
-                  <div className="text-[11px] text-stone-500">
-                    Báo bởi: {al.reported_by_name} • Mức độ: {al.severity}
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
+              <Pagination
+                currentPage={alertPage}
+                totalItems={barAlerts.length}
+                pageSize={pageSize}
+                onPageChange={setAlertPage}
+                compact
+              />
             </div>
           )}
         </section>

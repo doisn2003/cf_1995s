@@ -12,6 +12,7 @@ import { useNavigate } from 'react-router-dom';
 import type { EnterpriseConsolidatedPnlDTO } from '@cf19/shared';
 import { ApiClientError } from '../../api/apiClient';
 import { fetchExecutivePnlConsolidationApi } from '../../api/executiveAnalyticsApi';
+import { Pagination, paginateList } from '../../components/Pagination';
 
 export interface ExecutivePnlConsolidationPanelProps {
   refreshSignal: number;
@@ -26,6 +27,8 @@ export function ExecutivePnlConsolidationPanel({
   const [royaltyPctInput, setRoyaltyPctInput] = useState<string>('5');
   const [loading, setLoading] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [storePage, setStorePage] = useState<number>(1);
+  const [storePageSize, setStorePageSize] = useState<number>(5);
 
   const loadPnl = useCallback(async () => {
     setLoading(true);
@@ -277,7 +280,7 @@ export function ExecutivePnlConsolidationPanel({
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-stone-100">
-                  {report.stores.map((st) => (
+                  {paginateList(report.stores, storePage, storePageSize).map((st) => (
                     <tr key={st.store_id} className="hover:bg-stone-50">
                       <td className="px-3 py-2.5 font-mono font-extrabold text-amber-800">
                         #{st.rank ?? '-'}
@@ -354,6 +357,14 @@ export function ExecutivePnlConsolidationPanel({
                 </tbody>
               </table>
             </div>
+            <Pagination
+              currentPage={storePage}
+              totalItems={report.stores.length}
+              pageSize={storePageSize}
+              onPageChange={setStorePage}
+              onPageSizeChange={setStorePageSize}
+              pageSizeOptions={[5, 10, 20]}
+            />
           </section>
         </>
       )}
