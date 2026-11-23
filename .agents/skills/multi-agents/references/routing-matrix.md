@@ -1,0 +1,9 @@
+# MA TRẬN PHÂN LUỒNG CÔNG VIỆC TỰ ĐỘNG (AUTO-ROUTING MATRIX)
+
+Bảng dưới đây quy định rõ công việc nào thuộc thẩm quyền của **Quân Vua (`Argon High`)**, **Quân Hậu (`Neon High`)** và **Quân Tốt (`Flash High`)** khi `/multi-agents` vận hành:
+
+| Nhóm Công Việc | Tác Vụ Cụ Thể Trong Dự Án Cafe (`cf_19`) | Cấp Độ Suy Luận | Quân Cờ Đảm Nhận | Lý Do Phân Bổ |
+| :--- | :--- | :--- | :--- | :--- |
+| **1. Kiến trúc & Nghiệp vụ lõi** | - Giải quyết bài toán tách biệt hạch toán Kho Tổng vs. 4 Quán<br>- Chốt phương án bảo mật phân quyền 5 Role & chống thất thoát<br>- Nghiệm thu tổng thể các phân hệ trước khi Go-live | **Cực Cao** | **QUÂN VUA**<br>(`Gemini 4 Argon High`) | Đòi hỏi tư duy hệ thống sâu, nhìn xuyên suốt toàn bộ mô hình kinh doanh để không đi sai hướng. |
+| **2. Thiết kế Kỹ thuật chuyên sâu** | - Thiết kế bảng PostgreSQL, khóa ngoại, Supabase RLS Policies<br>- Viết hàm PL/pgSQL Transaction (Trừ kho BOM, Kết chuyển mẻ rang FIFO, Chuyển kho 2 pha)<br>- Thiết kế API Contract, Zod Schemas, thuật toán tính giá vốn MAC & thuật toán xếp lịch nhân sự<br>- Thiết kế cấu trúc UI/UX State & viết kịch bản Test Cases | **Cao** | **QUÂN HẬU**<br>(`Gemini 4 Neon High`) | Đòi hỏi kỹ năng Senior Dev & PM chuẩn xác để tạo ra "bản vẽ kỹ thuật không kẽ hở" trước khi đưa xuống cho Tốt. |
+| **3. Thực thi Code theo khuôn (Gánh Quota)** | - Viết các API Route / Controller CRUD theo đúng Zod Schema & Interface mà Quân Hậu đã viết sẵn<br>- Dựng các bảng danh sách, Form nhập liệu, Modal UI React/Tailwind theo đúng Props & Mockup của Quân Hậu<br>- Viết file `seed.sql`, dữ liệu mẫu, chuyển đổi DTO, viết Unit Test theo danh sách Test Case có sẵn | **Không suy luận**<br>*(Zero Reasoning)* | **QUÂN TỐT**<br>(`Gemini 3.8 Flash High`) | Khối lượng gõ code nhiều nhưng đã có khuôn đúc sẵn 100%; dùng Flash giúp tiết kiệm 70%–80% Quota của Argon và Neon mà vẫn đảm bảo chất lượng. |

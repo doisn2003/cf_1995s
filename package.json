@@ -1,0 +1,21 @@
+{
+  "name": "cf19-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "build": "npm run build --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "db:push": "npm run db:push --workspace=@cf19/api",
+    "dev:api": "npm run dev --workspace=@cf19/api",
+    "dev:web": "npm run dev --workspace=@cf19/web"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.2",
+    "vitest": "^3.0.9"
+  }
+}
